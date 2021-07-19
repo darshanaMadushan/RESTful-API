@@ -14,11 +14,17 @@ const server = http.createServer(function(request, respond) {
     const path = passedURL.pathname;
     const trimmedPath = path.replace(/^\/+|\/+$/g, '');
 
+    // Get the HTTP method
+    const method = request.method;
+
+    // Get the query string as an obeject
+    const queryStringObject = passedURL.query;
+
     // Send the response
     respond.end("Hellow World!\n")
 
     // Log the requested path
-    console.log("Request recieved on path: " + trimmedPath);
+    console.log("Request recieved on path: " + trimmedPath + " with the method: " + method + ", with query string:", queryStringObject);
 
 });
 
