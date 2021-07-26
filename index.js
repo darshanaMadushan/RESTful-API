@@ -3,6 +3,7 @@ const { futimesSync } = require("fs");
 const http = require("http");
 const url = require("url");
 const StringDecoder = require('string_decoder').StringDecoder;
+const config = require('./config'); //import the configuraion file of environments
 
 // Server should respond all the requets with a string
 const server = http.createServer(function(request, respond) {
@@ -69,9 +70,9 @@ const server = http.createServer(function(request, respond) {
     })
 });
 
-// Server listen on port 3000
-server.listen(3000, function() {
-    console.log("Server is listening on the port: 3000")
+// start the Server 
+server.listen(config.port, function() {
+    console.log("Server is listening on the port: " + config.port + " in " + config.envName + " mode.")
 });
 
 // define the handlers
