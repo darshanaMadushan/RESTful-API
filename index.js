@@ -10,11 +10,11 @@ const server = http.createServer(function(request, respond) {
     // Get the URL and parse it 
     const passedURL = url.parse(request.url, true);
 
-    // Get the path
+    // Get the path (ex: /admin)
     const path = passedURL.pathname;
     const trimmedPath = path.replace(/^\/+|\/+$/g, '');
 
-    // Get the query string as an obeject
+    // Get the query string as an obeject (ex: name="darshana")
     const queryStringObject = passedURL.query;
 
     // Get the HTTP method
@@ -34,11 +34,11 @@ const server = http.createServer(function(request, respond) {
     request.on('end', function() {
         buffer += decoder.end();
 
-        // choose the handler request should go to. if it is not in there directed to notFound handler
+        // choose the handler the request should go to. if it is not in there directed to notFound handler
         let chosenHandler = typeof(router[trimmedPath] !== 'undefined') ? router[trimmedPath] : handlers.notFound;
 
-        // construct the data object to be sent to the handler
-        let data = {
+        // construct the data object to sent to the handler
+        const data = {
             'trimmedPath': trimmedPath,
             'queryStringObject': queryStringObject,
             'method': method,
@@ -48,27 +48,26 @@ const server = http.createServer(function(request, respond) {
 
         // route the request to the handler specified in the router
         chosenHandler(data, function(statusCode, payload) {
-            // use the status code called back by handler or use the status code 200
-            statusCode = typeof(statusCode) === 'number' ? statusCode : 200;
+
+            // use the status code called back by handler or use the status code 200 as default
+            statusCode = typeof(statusCode) == 'number' ? statusCode : 200;
 
             // use the payload object called back by the handler, or return empty object
             payload = typeof(payload) === 'object' ? payload : {};
 
             // convert payload into a string 
-            const payloadString = JSON.stringify(payload);
+            let payloadString = JSON.stringify(payload);
 
             // return the response
-            respond.writeHead(statusCode);
+            respond.setHeader('Content-Type', 'application/json') //send header content-type to the sender on that is a JSON
+            respond.writeHead(statusCode); //buit in writeHead function to write the statusCode we are returning 
             respond.end(payloadString);
 
             // Log the requested path
             console.log("Returning this response: ", statusCode, payloadString);
-        });
-
-    });
-
+        })
+    })
 });
-
 
 // Server listen on port 3000
 server.listen(3000, function() {
@@ -78,18 +77,18 @@ server.listen(3000, function() {
 // define the handlers
 const handlers = {};
 
-// Sample handler
+// Define a Sample handler
 handlers.sample = function(data, callback) {
-    // callback http status code and payload object
+    // Callback http status code and a payload object
     callback(406, { 'name': 'sample handler' });
 }
 
-// Not found handler
+// Define Not found handler
 handlers.notFound = function(data, callback) {
     callback(404);
 }
 
-// Define a router 
+// Define a request router 
 const router = {
     'sample': handlers.sample
 };
