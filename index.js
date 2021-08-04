@@ -1,19 +1,33 @@
 // dependencies
-const { futimesSync } = require("fs");
 const http = require("http");
-const https = require('https'); //https servers instantiates
+const https = require('https'); //https servers modules
 const url = require("url");
 const StringDecoder = require('string_decoder').StringDecoder;
 const config = require('./config'); //import the configuraion file of environments
+const fs = require("fs"); //to get the details from the files asynchronously
 
 // instantiating HTTP server
-const server = http.createServer(function(request, respond) {
+const httpServer = http.createServer(function(request, respond) {
     unifiedServer(request, respond);
 });
 
-// start the Server 
-server.listen(config.httpPort, function() {
-    console.log("Server is listening on the port: " + config.httpPort + " in " + config.envName + " mode.")
+// start HTTP the Server 
+httpServer.listen(config.httpPort, function() {
+    console.log("Server is listening on the port: " + config.httpPort);
+});
+
+// instatiate HTTPS server 
+const httpsServerOptions = {
+    'key': fs.readFileSync('./https/kye.pem'),
+    'cert': fs.readFileSync('./https/cert.pem'),
+}
+const httpsServer = https.createServer(httpsServerOptions, function(request, respond) {
+    unifiedServer(request, respond);
+});
+
+// start the HTTPS server
+httpsServer.listen(config.httpsPort, function() {
+    console.log("Server is listening on the port: " + config.httpsPort);
 });
 
 // all the server logic for both HTTP and HTTPS server
